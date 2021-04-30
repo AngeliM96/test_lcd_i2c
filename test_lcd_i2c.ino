@@ -2,22 +2,9 @@
 #include <LiquidCrystal_I2C.h>
 
 LiquidCrystal_I2C display(0x27,16,2);   // Creo el objeto display  dirección  0x27 y 16 columnas x 2 filas
-const String numeroSerie = "0000" ;
-#define STR_LEN 12
+#define STR_LEN 12                      // Este valor debe ser minimo 12 para que se pueda imprimir siempre en la posición inicial
 char str_to_print[STR_LEN]={'A','i','r','e',' ','N','u','e','v','o'};
 
-//-----------Print-por-display----------------------
-void displayPrint(int posicion, int linea, String texto) {
-  display.setCursor(posicion, linea);       // Ubicamos el cursor en la posicion y linea deseada
-  display.print(texto);                     // Escribe primera linea del cartel
-}
-void imprimirCO2(int co2ppm) {
-  displayPrint(0, 1, "          ");
-  //display.clear();                                    // Borra pantalla
-  // Print CO2
-  displayPrint(0, 1, "CO2: " + String(co2ppm) + "ppm");   
-  logoUNAHUR();
-}
 void logoUNAHUR() {
   byte UNAHUR1[] = {
     B11100,
@@ -74,26 +61,18 @@ void setup() {
 
 void loop() {
   display.clear();
-  displayPrint(0, 1, "INICIANDO");
-  displayPrint(0, 0, "N/S: " + numeroSerie);
-  logoUNAHUR();
-  delay(5000);
-  display.clear();
-  logoUNAHUR();
-  displayPrint(0,0, "Aire Nuevo");
-  displayPrint(0, 1, "          ");
-  imprimirCO2(400);
   aireNuevo();
+  logoUNAHUR();
   delay(5000);
 }
 
 void scrollingText(uint8_t scrolled_by) {
-  for (uint8_t i=0;i<11;i++) {
+  for (uint8_t i=0;i<10;i++) {
     display.setCursor(i,0);
-    if (scrolled_by>=11) scrolled_by=0;
-    if (scrolled_by<10) display.print(str_to_print[scrolled_by]);
-    else display.print(' ');
-    scrolled_by++;
+    if (scrolled_by>=11) scrolled_by=0;                           // Esto permite volver al inicio del array de caracteres
+    if (scrolled_by<10) display.print(str_to_print[scrolled_by]); // Mientras el valor de scrolled_by sea un indice del array, imprime el valor
+    else display.print(' ');                                      // Se imprime un caracter vacío antes de volver al inicio del array para que haya un espacio entre la palabra Nuevo y Aire, en ese orden
+    scrolled_by++;                          
   }
 }
 
